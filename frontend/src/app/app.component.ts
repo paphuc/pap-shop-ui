@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { RouterOutlet, RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -11,9 +12,13 @@ import { CommonModule } from '@angular/common';
       <div class="nav-left">
         <a routerLink="/" class="logo">Pap Shop</a>
       </div>
-      <div class="nav-right">
+      <div class="nav-right" *ngIf="!isLoggedIn">
         <a routerLink="/login" class="nav-btn">Đăng nhập</a>
         <a routerLink="/register" class="nav-btn register-btn">Đăng ký</a>
+      </div>
+      <div class="nav-right" *ngIf="isLoggedIn">
+        <span class="user-info">Xin chào, {{currentUser?.username}}</span>
+        <button (click)="logout()" class="nav-btn logout-btn">Đăng xuất</button>
       </div>
     </nav>
     <div class="container">
@@ -56,12 +61,48 @@ import { CommonModule } from '@angular/common';
     .register-btn:hover {
       background: #2980b9;
     }
+    .user-info {
+      color: white;
+      margin-right: 15px;
+      font-weight: 500;
+    }
+    .logout-btn {
+      background: #e74c3c;
+    }
+    .logout-btn:hover {
+      background: #c0392b;
+    }
     .container {
       min-height: calc(100vh - 70px);
       background: #ecf0f1;
     }
   `]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'Pap Shop';
+  isLoggedIn = false;
+  currentUser: any = null;
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.checkLoginStatus();
+  }
+
+  checkLoginStatus() {
+    this.isLoggedIn = this.authService.isLoggedIn();
+    if (this.isLoggedIn) {
+      this.currentUser = this.authService.getCurrentUser();
+    }
+  }
+
+  logout() {
+    this.authService.logout();
+    this.isLoggedIn = false;
+    this.currentUser = null;
+    this.router.navigate(['/']);
+  }
 }

@@ -14,12 +14,20 @@ import { ApiService } from '../../services/api.service';
         <h2>Đăng ký</h2>
         <form (ngSubmit)="onRegister()" #registerForm="ngForm">
           <div class="form-group">
+            <label for="fullName">Họ và tên:</label>
+            <input type="text" id="fullName" name="fullName" [(ngModel)]="registerData.fullName" required>
+          </div>
+          <div class="form-group">
             <label for="username">Tên đăng nhập:</label>
             <input type="text" id="username" name="username" [(ngModel)]="registerData.username" required>
           </div>
           <div class="form-group">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" [(ngModel)]="registerData.email" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">Số điện thoại:</label>
+            <input type="tel" id="phone" name="phone" [(ngModel)]="registerData.phone" required>
           </div>
           <div class="form-group">
             <label for="password">Mật khẩu:</label>
@@ -91,8 +99,10 @@ import { ApiService } from '../../services/api.service';
 })
 export class RegisterComponent {
   registerData = {
+    fullName: '',
     username: '',
     email: '',
+    phone: '',
     password: ''
   };
   confirmPassword = '';
@@ -106,8 +116,10 @@ export class RegisterComponent {
     }
 
     const registerPayload = {
-      name: this.registerData.username,
+      name: this.registerData.fullName,
+      username: this.registerData.username,
       email: this.registerData.email,
+      phone: this.registerData.phone,
       password: this.registerData.password
     };
 

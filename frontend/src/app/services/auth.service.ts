@@ -22,6 +22,26 @@ export class AuthService {
     });
   }
 
+  isLoggedIn(): boolean {
+    return !!this.getToken();
+  }
+
+  getCurrentUser(): any {
+    const token = this.getToken();
+    if (!token) return null;
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return {
+        username: payload.sub,
+        email: payload.email,
+        roles: payload.scope
+      };
+    } catch {
+      return null;
+    }
+  }
+
   isAdmin(): boolean {
     const token = this.getToken();
     if (!token) return false;
@@ -32,6 +52,11 @@ export class AuthService {
     } catch {
       return false;
     }
+  }
+
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   }
 
   // Admin endpoints
