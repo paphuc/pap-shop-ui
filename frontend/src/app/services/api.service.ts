@@ -20,6 +20,20 @@ export class ApiService {
     return this.http.get<Product>(`${this.baseUrl}/products/${id}`);
   }
 
+  searchProducts(name: string): Observable<Product[]> {
+    const url = `${this.baseUrl}/products/search?name=${encodeURIComponent(name)}`;
+    console.log('Search API URL:', url);
+    // Thử không có auth header trước
+    return this.http.get<Product[]>(url);
+  }
+
+  searchProductsWithAuth(name: string): Observable<Product[]> {
+    const url = `${this.baseUrl}/products/search?name=${encodeURIComponent(name)}`;
+    return this.http.get<Product[]>(url, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
   addProduct(product: Product): Observable<Product> {
     return this.http.post<Product>(`${this.baseUrl}/products`, product, {
       headers: this.getAuthHeaders()
@@ -59,5 +73,23 @@ export class ApiService {
 
   register(user: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/user/register`, user, { responseType: 'text' });
+  }
+
+  // Forgot Password APIs
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/user/forgot-password`, { email }, { responseType: 'text' });
+  }
+
+  resetPasswordWithCode(token: string, newPassword: string, confirmPassword: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/user/reset-password`, {
+      token,
+      newPassword,
+      confirmPassword
+    }, { responseType: 'text' });
+  }
+
+  testConnection(port: number): Observable<Product[]> {
+    const testUrl = `http://localhost:${port}/api/products`;
+    return this.http.get<Product[]>(testUrl);
   }
 }
