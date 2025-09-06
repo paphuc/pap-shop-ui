@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
         <a routerLink="/" class="logo">Pap Shop</a>
       </div>
       <div class="nav-right">
+        <a routerLink="/profile" class="nav-btn">Profile</a>
         <a routerLink="/login" class="nav-btn">Đăng nhập</a>
         <a routerLink="/register" class="nav-btn register-btn">Đăng ký</a>
       </div>

@@ -52,4 +52,20 @@ export class AuthService {
       headers: this.getAuthHeaders() 
     });
   }
+
+  getCurrentUser(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/user/profile`, { 
+      headers: this.getAuthHeaders() 
+    });
+  }
+
+  updateProfile(userInfo: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/user/profile`, userInfo, { 
+      headers: this.getAuthHeaders() 
+    });
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.getToken();
+  }
 }
