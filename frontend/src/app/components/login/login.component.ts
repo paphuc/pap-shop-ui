@@ -26,6 +26,9 @@ import { ApiService } from '../../services/api.service';
         <p class="register-link">
           Chưa có tài khoản? <a routerLink="/register">Đăng ký</a>
         </p>
+        <p class="forgot-link">
+          <a routerLink="/forgot-password">Quên mật khẩu?</a>
+        </p>
         <div *ngIf="message" class="alert">{{message}}</div>
       </div>
     </div>
@@ -78,6 +81,15 @@ import { ApiService } from '../../services/api.service';
       text-align: center;
       margin-top: 15px;
     }
+    .forgot-link {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .forgot-link a {
+      color: #e74c3c;
+      text-decoration: none;
+      font-size: 14px;
+    }
     .alert {
       margin-top: 15px;
       padding: 10px;
@@ -99,7 +111,9 @@ export class LoginComponent {
         this.message = 'Đăng nhập thành công!';
         localStorage.setItem('token', token);
         setTimeout(() => {
-          this.router.navigate(['/']);
+          this.router.navigate(['/']).then(() => {
+            window.location.reload(); // Refresh để cập nhật navbar
+          });
         }, 1000);
       },
       error: (error) => {

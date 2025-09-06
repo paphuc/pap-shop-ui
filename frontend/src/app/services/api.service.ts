@@ -7,7 +7,7 @@ import { Product, Category, User } from '../models/product.model';
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:8080/api';
+  private baseUrl = 'http://localhost:8080/api'; // Thay đổi port nếu cần
 
   constructor(private http: HttpClient) {}
 
@@ -59,5 +59,18 @@ export class ApiService {
 
   register(user: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/user/register`, user, { responseType: 'text' });
+  }
+
+  // Forgot Password APIs
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/user/forgot-password`, { email }, { responseType: 'text' });
+  }
+
+  resetPasswordWithCode(token: string, newPassword: string, confirmPassword: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/user/reset-password`, {
+      token,
+      newPassword,
+      confirmPassword
+    }, { responseType: 'text' });
   }
 }
