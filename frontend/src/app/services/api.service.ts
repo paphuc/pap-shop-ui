@@ -7,7 +7,7 @@ import { Product, Category, User } from '../models/product.model';
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:8080/api'; // Thay đổi port nếu cần
+  private baseUrl = 'http://localhost:8080/api';
 
   constructor(private http: HttpClient) {}
 
@@ -18,6 +18,20 @@ export class ApiService {
 
   getProduct(id: number): Observable<Product> {
     return this.http.get<Product>(`${this.baseUrl}/products/${id}`);
+  }
+
+  searchProducts(name: string): Observable<Product[]> {
+    const url = `${this.baseUrl}/products/search?name=${encodeURIComponent(name)}`;
+    console.log('Search API URL:', url);
+    // Thử không có auth header trước
+    return this.http.get<Product[]>(url);
+  }
+
+  searchProductsWithAuth(name: string): Observable<Product[]> {
+    const url = `${this.baseUrl}/products/search?name=${encodeURIComponent(name)}`;
+    return this.http.get<Product[]>(url, {
+      headers: this.getAuthHeaders()
+    });
   }
 
   addProduct(product: Product): Observable<Product> {
@@ -72,5 +86,10 @@ export class ApiService {
       newPassword,
       confirmPassword
     }, { responseType: 'text' });
+  }
+
+  testConnection(port: number): Observable<Product[]> {
+    const testUrl = `http://localhost:${port}/api/products`;
+    return this.http.get<Product[]>(testUrl);
   }
 }
