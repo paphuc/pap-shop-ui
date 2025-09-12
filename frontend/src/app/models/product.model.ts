@@ -14,6 +14,7 @@ export interface Product {
   sku: string;
   category: { name: string; id: number };
   images?: ProductImage[];
+  image?: string;
   specifications?: { [key: string]: string };
   rating?: number;
   reviews?: number;

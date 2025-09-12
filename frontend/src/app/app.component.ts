@@ -17,14 +17,14 @@ import { Product } from './models/product.model';
       </div>
       <div class="nav-center">
         <div class="search-container">
-          <input 
-            type="text" 
-            [(ngModel)]="searchQuery" 
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
             (keyup.enter)="onSearch()"
             (input)="onSearchInput()"
             (focus)="onSearchFocus()"
             (blur)="onSearchBlur()"
-            placeholder="Tìm kiếm sản phẩm..." 
+            placeholder="Tìm kiếm sản phẩm..."
             class="search-input"
           />
           <button (click)="onSearch()" class="search-btn">
@@ -47,11 +47,22 @@ import { Product } from './models/product.model';
         <a routerLink="/register" class="nav-btn register-btn">Đăng ký</a>
       </div>
       <div class="nav-right" *ngIf="isLoggedIn">
-        <span class="user-info">Xin chào, {{currentUser?.username}}</span>
-        <button (click)="logout()" class="nav-btn logout-btn">Đăng xuất</button>
+        <div class="user-dropdown" (click)="toggleUserMenu()">
+          <div class="user-avatar">
+            {{(currentUser?.username || 'U').charAt(0).toUpperCase()}}
+          </div>
+          <div class="dropdown-menu" *ngIf="showUserMenu">
+            <a routerLink="/profile" class="dropdown-item" (click)="closeUserMenu()">
+              <i class="fas fa-user"></i> Profile
+            </a>
+            <button class="dropdown-item" (click)="logout()">
+              <i class="fas fa-sign-out-alt"></i> Đăng xuất
+            </button>
+          </div>
+        </div>
       </div>
     </nav>
-    
+
     <!-- Search Results Overlay -->
     <div class="search-overlay" *ngIf="showSearchResults" (click)="closeSearchResults()">
       <div class="search-results" (click)="$event.stopPropagation()">
@@ -272,6 +283,58 @@ import { Product } from './models/product.model';
       min-height: calc(100vh - 70px);
       background: #ecf0f1;
     }
+    .user-dropdown {
+      position: relative;
+      cursor: pointer;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      background: #3498db;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+    .user-avatar:hover {
+      background: #2980b9;
+    }
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      min-width: 150px;
+      z-index: 1000;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      color: #333;
+      text-decoration: none;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .dropdown-item:hover {
+      background: #f8f9fa;
+    }
+    .dropdown-item i {
+      margin-right: 8px;
+      width: 16px;
+    }
   `]
 })
 export class AppComponent implements OnInit {
@@ -283,12 +346,18 @@ export class AppComponent implements OnInit {
   showSearchResults = false;
   suggestions: Product[] = [];
   showSuggestions = false;
+  showUserMenu = false;
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private apiService: ApiService
-  ) {}
+  ) {
+    // Lắng nghe sự kiện navigation để cập nhật trạng thái login
+    this.router.events.subscribe(() => {
+      this.checkLoginStatus();
+    });
+  }
 
   ngOnInit() {
     this.checkLoginStatus();
@@ -297,14 +366,14 @@ export class AppComponent implements OnInit {
   checkLoginStatus() {
     this.isLoggedIn = this.authService.isLoggedIn();
     if (this.isLoggedIn) {
-      this.currentUser = this.authService.getCurrentUser();
+      this.currentUser = this.authService.getCurrentUserFromToken();
     }
   }
 
   logout() {
     this.authService.logout();
-    this.isLoggedIn = false;
-    this.currentUser = null;
+    this.checkLoginStatus();
+    this.showUserMenu = false;
     this.router.navigate(['/']);
   }
 
@@ -364,6 +433,14 @@ export class AppComponent implements OnInit {
     this.searchQuery = product.name;
     this.showSuggestions = false;
     this.onSearch();
+  }
+
+  toggleUserMenu() {
+    this.showUserMenu = !this.showUserMenu;
+  }
+
+  closeUserMenu() {
+    this.showUserMenu = false;
   }
 
 

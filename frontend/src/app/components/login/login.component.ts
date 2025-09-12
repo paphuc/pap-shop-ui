@@ -106,19 +106,27 @@ export class LoginComponent {
   constructor(private apiService: ApiService, private router: Router) {}
 
   onLogin() {
+    this.message = 'Đang đăng nhập...';
     this.apiService.login(this.loginData.emailOrPhone, this.loginData.password).subscribe({
-      next: (token) => {
+      next: (response) => {
+        console.log('Login response:', response);
         this.message = 'Đăng nhập thành công!';
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', response);
         setTimeout(() => {
-          this.router.navigate(['/']).then(() => {
-            window.location.reload(); // Refresh để cập nhật navbar
-          });
+          this.router.navigate(['/']);
         }, 1000);
       },
       error: (error) => {
         console.error('Login error:', error);
-        this.message = 'Đăng nhập thất bại: ' + (error.error || error.message || 'Lỗi không xác định');
+        if (error.status === 0) {
+          this.message = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+        } else if (error.status === 401) {
+          this.message = 'Email/số điện thoại hoặc mật khẩu không đúng.';
+        } else if (error.status === 404) {
+          this.message = 'API không tồn tại. Vui lòng kiểm tra server.';
+        } else {
+          this.message = 'Đăng nhập thất bại: ' + (error.error?.message || error.message || 'Lỗi server');
+        }
       }
     });
   }
