@@ -101,10 +101,21 @@ export class HomeComponent implements OnInit {
   }
 
   getImageUrl(product: Product): string {
+    // Kiểm tra images array trước
     if (product.images && product.images.length > 0 && product.images[0].imageUrl) {
-      return product.images[0].imageUrl;
+      const imageUrl = product.images[0].imageUrl;
+      console.log('Full image URL:', imageUrl);
+      return imageUrl;
     }
-    return product.image || '/assets/no-image.svg';
+    
+    // Kiểm tra image field
+    if (product.image) {
+      const imageUrl = product.image;
+      console.log('Image field URL:', imageUrl);
+      return imageUrl.startsWith('http') ? imageUrl : `/assets/${imageUrl}`;
+    }
+    
+    return '/assets/no-image.svg';
   }
 
   onImageError(event: any) {
