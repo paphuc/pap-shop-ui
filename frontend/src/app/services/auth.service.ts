@@ -26,18 +26,23 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  getCurrentUser(): any {
+  getCurrentUserFromToken(): any {
     const token = this.getToken();
     if (!token) return null;
     
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
+      console.log('Token payload:', payload);
       return {
         username: payload.sub,
+        name: payload.name || payload.fullName || payload.sub,
         email: payload.email,
+        phone: payload.phone || '',
+        address: payload.address || '',
         roles: payload.scope
       };
-    } catch {
+    } catch (error) {
+      console.error('Error parsing token:', error);
       return null;
     }
   }
@@ -74,6 +79,18 @@ export class AuthService {
 
   updateRole(role: any): Observable<any> {
     return this.http.put(`${this.baseUrl}/role/update`, role, { 
+      headers: this.getAuthHeaders() 
+    });
+  }
+
+  getCurrentUser(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/user/profile`, { 
+      headers: this.getAuthHeaders() 
+    });
+  }
+
+  updateProfile(userInfo: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/user/profile`, userInfo, { 
       headers: this.getAuthHeaders() 
     });
   }

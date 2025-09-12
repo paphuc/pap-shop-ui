@@ -1,0 +1,51 @@
+<div class="profile-container">
+  <h2>Thông tin cá nhân</h2>
+  
+  <div *ngIf="loading" class="loading">Loading...</div>
+  <div *ngIf="error" class="error">{{error}}</div>
+  
+  <div *ngIf="!loading && !error" class="profile-card">
+    <div class="profile-header">
+      <div class="avatar">
+        <i class="fas fa-user"></i>
+      </div>
+      <h3>{{user.name || 'Người dùng'}}</h3>
+    </div>
+
+    <div class="profile-info">
+      <div class="info-item">
+        <label>Tên:</label>
+        <input *ngIf="isEditing" [(ngModel)]="user.name" type="text" class="form-input">
+        <span *ngIf="!isEditing">{{user.name || 'Chưa cập nhật'}}</span>
+      </div>
+
+      <div class="info-item">
+        <label>Email:</label>
+        <input *ngIf="isEditing" [(ngModel)]="user.email" type="email" class="form-input">
+        <span *ngIf="!isEditing">{{user.email || 'Chưa cập nhật'}}</span>
+      </div>
+
+      <div class="info-item">
+        <label>Số điện thoại:</label>
+        <input *ngIf="isEditing" [(ngModel)]="user.phone" type="tel" class="form-input">
+        <span *ngIf="!isEditing">{{user.phone || 'Chưa cập nhật'}}</span>
+      </div>
+
+      <div class="info-item">
+        <label>Địa chỉ:</label>
+        <textarea *ngIf="isEditing" [(ngModel)]="user.address" class="form-input"></textarea>
+        <span *ngIf="!isEditing">{{user.address || 'Chưa cập nhật'}}</span>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button *ngIf="!isEditing" (click)="toggleEdit()" class="btn btn-primary">
+        Chỉnh sửa
+      </button>
+      <div *ngIf="isEditing">
+        <button (click)="saveProfile()" class="btn btn-success">Lưu</button>
+        <button (click)="toggleEdit()" class="btn btn-secondary">Hủy</button>
+      </div>
+    </div>
+  </div>
+</div>
