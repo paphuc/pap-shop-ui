@@ -1,20 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { Product } from '../../models/product.model';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <div class="home-container">
       <h1>Chào mừng đến với Pap Shop</h1>
       <div class="products-grid">
-        <div *ngFor="let product of products" class="product-card">
+        <div *ngFor="let product of products" class="product-card" [routerLink]="['/products', product.id]">
+          <img [src]="getImageUrl(product)" [alt]="product.name" (error)="onImageError($event)">
           <h3>{{ product.name }}</h3>
           <p>{{ product.description }}</p>
-          <p class="price">{{ product.price | currency:'VND' }}</p>
+          <p class="price">{{ formatPrice(product.price) }}</p>
         </div>
       </div>
     </div>
@@ -34,6 +36,20 @@ import { Product } from '../../models/product.model';
       padding: 15px;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+    .product-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-bottom: 10px;
     }
     .price {
       font-weight: bold;
@@ -58,12 +74,25 @@ export class HomeComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading products:', error);
-        // Hiển thị dữ liệu mẫu nếu không kết nối được backend
-        this.products = [
-          { id: 1, name: 'Sản phẩm mẫu 1', description: 'Mô tả sản phẩm 1', price: 100000, categoryId: 1 },
-          { id: 2, name: 'Sản phẩm mẫu 2', description: 'Mô tả sản phẩm 2', price: 200000, categoryId: 1 }
-        ];
+        this.products = [];
       }
     });
+  }
+
+  getImageUrl(product: Product): string {
+    return product.images && product.images.length > 0 && product.images[0].imageUrl 
+      ? product.images[0].imageUrl 
+      : '/assets/images/no-image.svg';
+  }
+
+  onImageError(event: any) {
+    event.target.src = '/assets/images/no-image.svg';
+  }
+
+  formatPrice(price: number): string {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(price);
   }
 }
