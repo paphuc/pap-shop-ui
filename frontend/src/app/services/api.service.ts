@@ -17,7 +17,17 @@ export class ApiService {
   }
 
   getProduct(id: number): Observable<Product> {
+    console.log('Getting product with ID:', id);
+    console.log('API URL:', `${this.baseUrl}/products/${id}`);
+    
+    // Thử không có auth header trước
     return this.http.get<Product>(`${this.baseUrl}/products/${id}`);
+  }
+
+  getProductWithAuth(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.baseUrl}/products/${id}`, {
+      headers: this.getAuthHeaders()
+    });
   }
 
   searchProducts(name: string): Observable<Product[]> {
@@ -65,10 +75,19 @@ export class ApiService {
 
   // User APIs
   login(emailOrPhone: string, password: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/user/login`, {
+    const loginData = {
       emailOrPhoneOrUsername: emailOrPhone,
       password: password
-    }, { responseType: 'text' });
+    };
+    console.log('Login request:', loginData);
+    console.log('Login URL:', `${this.baseUrl}/user/login`);
+    
+    return this.http.post(`${this.baseUrl}/user/login`, loginData, { 
+      responseType: 'text',
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
+    });
   }
 
   register(user: any): Observable<any> {
@@ -91,5 +110,9 @@ export class ApiService {
   testConnection(port: number): Observable<Product[]> {
     const testUrl = `http://localhost:${port}/api/products`;
     return this.http.get<Product[]>(testUrl);
+  }
+
+  testServer(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/health`, { responseType: 'text' });
   }
 }
