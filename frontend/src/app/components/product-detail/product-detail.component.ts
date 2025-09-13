@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
+import { CartService } from '../../services/cart.service';
 import { Product } from '../../models/product.model';
 
 @Component({
@@ -15,11 +16,14 @@ export class ProductDetailComponent implements OnInit {
   product: Product | null = null;
   loading = true;
   error = '';
+  selectedQuantity = 1;
+  addingToCart = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private cartService: CartService
   ) {}
 
   ngOnInit(): void {
@@ -78,6 +82,32 @@ export class ProductDetailComponent implements OnInit {
       this.error = `Lỗi tải sản phẩm (${error.status}): ${error.message || 'Không xác định'}`;
     }
     this.loading = false;
+  }
+
+  increaseQuantity() {
+    this.selectedQuantity++;
+  }
+
+  decreaseQuantity() {
+    if (this.selectedQuantity > 1) {
+      this.selectedQuantity--;
+    }
+  }
+
+  addToCart() {
+    if (!this.product || !this.product.id) return;
+    
+    this.addingToCart = true;
+    this.cartService.addToCart(this.product.id, this.selectedQuantity).subscribe({
+      next: () => {
+        alert('Đã thêm vào giỏ hàng!');
+        this.addingToCart = false;
+      },
+      error: () => {
+        alert('Lỗi khi thêm vào giỏ hàng!');
+        this.addingToCart = false;
+      }
+    });
   }
 
   goBack(): void {
