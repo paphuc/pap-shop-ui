@@ -23,7 +23,15 @@
         <span class="quantity-value">{{ product.quantity }}</span>
       </div>
       <div class="product-actions">
-        <button class="add-to-cart-btn">Thêm vào giỏ hàng</button>
+        <div class="quantity-selector">
+          <label>Số lượng:</label>
+          <button (click)="decreaseQuantity()">-</button>
+          <span>{{ selectedQuantity }}</span>
+          <button (click)="increaseQuantity()">+</button>
+        </div>
+        <button class="add-to-cart-btn" (click)="addToCart()" [disabled]="addingToCart">
+          {{ addingToCart ? 'Đang thêm...' : 'Thêm vào giỏ hàng' }}
+        </button>
         <button class="buy-now-btn">Mua ngay</button>
       </div>
     </div>
