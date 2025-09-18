@@ -39,7 +39,7 @@ export class ProfileComponent implements OnInit {
 
   loadUserProfile() {
     this.authService.getCurrentUser().subscribe({
-      next: (data) => {
+      next: (data: any) => {
         this.user = {
           id: data.id,
           name: data.name || '',
@@ -51,7 +51,7 @@ export class ProfileComponent implements OnInit {
         this.loading = false;
         this.error = '';
       },
-      error: (err) => {
+      error: (err: any) => {
         this.error = 'Không thể tải thông tin người dùng';
         this.loading = false;
       }
@@ -71,13 +71,13 @@ export class ProfileComponent implements OnInit {
     };
 
     this.authService.updateProfile(updateData).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         this.isEditing = false;
         this.error = '';
         alert('Cập nhật thông tin thành công!');
         this.loadUserProfile();
       },
-      error: (err) => {
+      error: (err: any) => {
         this.error = 'Không thể cập nhật thông tin';
       }
     });

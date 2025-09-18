@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { CartService } from '../../services/cart.service';
 import { Product } from '../../models/product.model';
 
 @Component({
@@ -19,6 +20,7 @@ import { Product } from '../../models/product.model';
           <div class="product-info">
             <h3 class="product-name">{{ product.name }}</h3>
             <p class="product-price">{{ product.price | currency:'VND':'symbol':'1.0-0' }}</p>
+            <button class="add-to-cart-btn" (click)="addToCart(product, $event)">Thêm vào giỏ</button>
           </div>
         </div>
       </div>
@@ -70,17 +72,36 @@ import { Product } from '../../models/product.model';
       line-height: 1.4;
     }
     .product-price {
-      margin: 0;
+      margin: 0 0 10px 0;
       font-size: 18px;
       font-weight: bold;
       color: #e74c3c;
+    }
+    .add-to-cart-btn {
+      width: 100%;
+      padding: 8px 16px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.3s;
+    }
+    .add-to-cart-btn:hover {
+      background: #2980b9;
     }
   `]
 })
 export class HomeComponent implements OnInit {
   products: Product[] = [];
 
-  constructor(private apiService: ApiService, private router: Router) {}
+  constructor(
+    private apiService: ApiService, 
+    private router: Router,
+    private cartService: CartService
+  ) {}
 
   ngOnInit() {
     this.loadProducts();
@@ -101,5 +122,15 @@ export class HomeComponent implements OnInit {
 
   viewProduct(productId: number) {
     this.router.navigate(['/product', productId]);
+  }
+
+  addToCart(product: Product, event: Event) {
+    event.stopPropagation();
+    if (product.id) {
+      this.cartService.addToCart(product.id, 1).subscribe({
+        next: () => alert('Đã thêm vào giỏ hàng!'),
+        error: () => alert('Lỗi khi thêm vào giỏ hàng!')
+      });
+    }
   }
 }

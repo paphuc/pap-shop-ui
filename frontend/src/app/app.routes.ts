@@ -6,6 +6,7 @@ import { ProductDetailComponent } from './components/product-detail/product-deta
 import { ProfileComponent } from './components/profile/profile.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { CartComponent } from './components/cart/cart.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -13,6 +14,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'product/:id', component: ProductDetailComponent },
   { path: 'profile', component: ProfileComponent },
+  { path: 'cart', component: CartComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent }
 ];
