@@ -84,6 +84,24 @@ export class ProductDetailComponent implements OnInit {
     this.loading = false;
   }
 
+  getImageUrl(product: Product): string {
+    // Kiểm tra images array trước
+    if (product.images && product.images.length > 0 && product.images[0].imageUrl) {
+      return product.images[0].imageUrl;
+    }
+    
+    // Kiểm tra image field
+    if (product.image) {
+      return product.image.startsWith('http') ? product.image : `/assets/${product.image}`;
+    }
+    
+    return '/assets/no-image.svg';
+  }
+
+  onImageError(event: any) {
+    event.target.src = '/assets/no-image.svg';
+  }
+
   increaseQuantity() {
     this.selectedQuantity++;
   }
