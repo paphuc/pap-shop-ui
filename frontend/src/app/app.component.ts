@@ -391,7 +391,6 @@ export class AppComponent implements OnInit {
     private apiService: ApiService,
     private cartService: CartService
   ) {
-    // Lắng nghe sự kiện navigation để cập nhật trạng thái login
     this.router.events.subscribe(() => {
       this.checkLoginStatus();
     });
@@ -430,8 +429,7 @@ export class AppComponent implements OnInit {
           this.searchResults = products;
           this.showSearchResults = true;
         },
-        error: (error) => {
-          console.error('Search error:', error);
+        error: () => {
           this.searchResults = [];
           this.showSearchResults = true;
         }
@@ -448,7 +446,7 @@ export class AppComponent implements OnInit {
     if (this.searchQuery.trim().length >= 2) {
       this.apiService.searchProducts(this.searchQuery.trim()).subscribe({
         next: (products) => {
-          this.suggestions = products.slice(0, 5); // Chỉ hiện thị 5 gợi ý đầu tiên
+          this.suggestions = products.slice(0, 5);
           this.showSuggestions = true;
         },
         error: () => {
@@ -469,7 +467,6 @@ export class AppComponent implements OnInit {
   }
 
   onSearchBlur() {
-    // Delay để cho phép click vào suggestion
     setTimeout(() => {
       this.showSuggestions = false;
     }, 200);
@@ -488,6 +485,4 @@ export class AppComponent implements OnInit {
   closeUserMenu() {
     this.showUserMenu = false;
   }
-
-
 }
