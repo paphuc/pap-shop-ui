@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
+import { CartService } from '../../services/cart.service';
 import { Product } from '../../models/product.model';
 
 @Component({
@@ -15,11 +16,14 @@ export class ProductDetailComponent implements OnInit {
   product: Product | null = null;
   loading = true;
   error = '';
+  selectedQuantity = 1;
+  addingToCart = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private cartService: CartService
   ) {}
 
   ngOnInit(): void {
@@ -55,6 +59,50 @@ export class ProductDetailComponent implements OnInit {
       this.error = `Lỗi tải sản phẩm (${error.status}): ${error.message || 'Không xác định'}`;
     }
     this.loading = false;
+  }
+
+  getImageUrl(product: Product): string {
+    // Kiểm tra images array trước
+    if (product.images && product.images.length > 0 && product.images[0].imageUrl) {
+      return product.images[0].imageUrl;
+    }
+    
+    // Kiểm tra image field
+    if (product.image) {
+      return product.image.startsWith('http') ? product.image : `/assets/${product.image}`;
+    }
+    
+    return '/assets/no-image.svg';
+  }
+
+  onImageError(event: any) {
+    event.target.src = '/assets/no-image.svg';
+  }
+
+  increaseQuantity() {
+    this.selectedQuantity++;
+  }
+
+  decreaseQuantity() {
+    if (this.selectedQuantity > 1) {
+      this.selectedQuantity--;
+    }
+  }
+
+  addToCart() {
+    if (!this.product || !this.product.id) return;
+    
+    this.addingToCart = true;
+    this.cartService.addToCart(this.product.id, this.selectedQuantity).subscribe({
+      next: () => {
+        alert('Đã thêm vào giỏ hàng!');
+        this.addingToCart = false;
+      },
+      error: () => {
+        alert('Lỗi khi thêm vào giỏ hàng!');
+        this.addingToCart = false;
+      }
+    });
   }
 
   goBack(): void {

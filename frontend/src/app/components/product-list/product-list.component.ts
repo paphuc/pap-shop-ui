@@ -39,7 +39,7 @@ import { Product, Category } from '../../models/product.model';
 export class ProductListComponent implements OnInit {
   products: Product[] = [];
   categories: Category[] = [];
-  newProduct: Product = { name: '', price: 0, categoryId: 0 };
+  newProduct: Partial<Product> = { name: '', price: 0, categoryId: 0 };
 
   constructor(private apiService: ApiService) {}
 
@@ -62,7 +62,7 @@ export class ProductListComponent implements OnInit {
 
   addProduct() {
     if (this.newProduct.name && this.newProduct.price && this.newProduct.categoryId) {
-      this.apiService.addProduct(this.newProduct).subscribe(() => {
+      this.apiService.addProduct(this.newProduct as Product).subscribe(() => {
         this.loadProducts();
         this.newProduct = { name: '', price: 0, categoryId: 0 };
       });

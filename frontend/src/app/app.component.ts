@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from './services/auth.service';
 import { ApiService } from './services/api.service';
+import { CartService } from './services/cart.service';
 import { Product } from './models/product.model';
 
 @Component({
@@ -47,6 +48,14 @@ import { Product } from './models/product.model';
         <a routerLink="/register" class="nav-btn register-btn">Đăng ký</a>
       </div>
       <div class="nav-right" *ngIf="isLoggedIn">
+        <a routerLink="/cart" class="cart-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="m1 1 4 4 2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          <span class="cart-badge" *ngIf="cartCount > 0">{{cartCount}}</span>
+        </a>
         <div class="user-dropdown" (click)="toggleUserMenu()">
           <div class="user-avatar">
             {{(currentUser?.username || 'U').charAt(0).toUpperCase()}}
@@ -335,6 +344,33 @@ import { Product } from './models/product.model';
       margin-right: 8px;
       width: 16px;
     }
+    .cart-icon {
+      color: white;
+      padding: 8px;
+      border-radius: 4px;
+      transition: background 0.3s;
+      margin-right: 15px;
+      position: relative;
+      text-decoration: none;
+    }
+    .cart-icon:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    .cart-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #e74c3c;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
   `]
 })
 export class AppComponent implements OnInit {
@@ -347,11 +383,13 @@ export class AppComponent implements OnInit {
   suggestions: Product[] = [];
   showSuggestions = false;
   showUserMenu = false;
+  cartCount = 0;
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private cartService: CartService
   ) {
     this.router.events.subscribe(() => {
       this.checkLoginStatus();
@@ -360,17 +398,25 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.checkLoginStatus();
+    this.cartService.getCartCount().subscribe(count => {
+      this.cartCount = count;
+    });
   }
 
   checkLoginStatus() {
+    const wasLoggedIn = this.isLoggedIn;
     this.isLoggedIn = this.authService.isLoggedIn();
     if (this.isLoggedIn) {
       this.currentUser = this.authService.getCurrentUserFromToken();
+      if (!wasLoggedIn) {
+        this.cartService.refreshCartCount();
+      }
     }
   }
 
   logout() {
     this.authService.logout();
+    this.cartService.refreshCartCount();
     this.checkLoginStatus();
     this.showUserMenu = false;
     this.router.navigate(['/']);

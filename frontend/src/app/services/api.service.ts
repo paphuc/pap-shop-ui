@@ -85,4 +85,46 @@ export class ApiService {
   }
 
 
+  testServer(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/health`, { responseType: 'text' });
+  }
+
+  // Cart APIs
+  getCart(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/cart`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  addToCart(productId: number, quantity: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cart/add`, 
+      { productId, quantity }, 
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  updateCartItem(cartItemId: number, quantity: number): Observable<any> {
+    return this.http.put(`${this.baseUrl}/cart/items/${cartItemId}`, 
+      { quantity }, 
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  removeCartItem(cartItemId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/cart/items/${cartItemId}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  clearCart(): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/cart/clear`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  getCartCount(): Observable<number> {
+    return this.http.get<number>(`${this.baseUrl}/cart/count`, {
+      headers: this.getAuthHeaders()
+    });
+  }
 }
