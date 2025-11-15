@@ -158,7 +158,11 @@ export class ForgotPasswordComponent {
         }, 2000);
       },
       error: (error) => {
-        this.message = error.error || 'Email không tồn tại trong hệ thống';
+        if (error.status === 500) {
+          this.message = 'Không tìm thấy email';
+        } else {
+          this.message = error.error?.message || 'Email không tồn tại trong hệ thống';
+        }
         this.messageClass = 'error';
         this.isLoading = false;
       }

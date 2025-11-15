@@ -5,12 +5,14 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from './services/auth.service';
 import { ApiService } from './services/api.service';
 import { CartService } from './services/cart.service';
+import { AuthTimeoutService } from './services/auth-timeout.service';
 import { Product } from './models/product.model';
+import { AnnouncementToastComponent } from './components/announcement/announcement-toast.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, CommonModule, FormsModule],
+  imports: [RouterOutlet, RouterLink, CommonModule, FormsModule, AnnouncementToastComponent],
   template: `
     <nav class="navbar">
       <div class="nav-left">
@@ -48,6 +50,7 @@ import { Product } from './models/product.model';
         <a routerLink="/register" class="nav-btn register-btn">Đăng ký</a>
       </div>
       <div class="nav-right" *ngIf="isLoggedIn">
+        <a routerLink="/announcements" class="nav-btn">Thông báo</a>
         <a routerLink="/cart" class="cart-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="9" cy="21" r="1"></circle>
@@ -62,7 +65,10 @@ import { Product } from './models/product.model';
           </div>
           <div class="dropdown-menu" *ngIf="showUserMenu">
             <a routerLink="/profile" class="dropdown-item" (click)="closeUserMenu()">
-              <i class="fas fa-user"></i> Profile
+              <i class="fas fa-user"></i> Hồ sơ
+            </a>
+            <a routerLink="/orders" class="dropdown-item" (click)="closeUserMenu()">
+              <i class="fas fa-shopping-bag"></i> Đơn hàng của tôi
             </a>
             <button class="dropdown-item" (click)="logout()">
               <i class="fas fa-sign-out-alt"></i> Đăng xuất
@@ -94,6 +100,8 @@ import { Product } from './models/product.model';
       </div>
     </div>
 
+    <app-announcement-toast></app-announcement-toast>
+    
     <div class="container">
       <router-outlet></router-outlet>
     </div>
@@ -389,7 +397,8 @@ export class AppComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private apiService: ApiService,
-    private cartService: CartService
+    private cartService: CartService,
+    private authTimeoutService: AuthTimeoutService
   ) {
     this.router.events.subscribe(() => {
       this.checkLoginStatus();
@@ -410,11 +419,15 @@ export class AppComponent implements OnInit {
       this.currentUser = this.authService.getCurrentUserFromToken();
       if (!wasLoggedIn) {
         this.cartService.refreshCartCount();
+        this.authTimeoutService.startTimeout();
       }
+    } else {
+      this.authTimeoutService.clearTimeout();
     }
   }
 
   logout() {
+    this.authTimeoutService.clearTimeout();
     this.authService.logout();
     this.cartService.refreshCartCount();
     this.checkLoginStatus();

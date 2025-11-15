@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product, Category, User } from '../models/product.model';
+import { Review, CreateReviewRequest, UpdateReviewRequest } from '../models/review.model';
 
 @Injectable({
   providedIn: 'root'
@@ -124,6 +125,48 @@ export class ApiService {
 
   getCartCount(): Observable<number> {
     return this.http.get<number>(`${this.baseUrl}/cart/count`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  // Generic HTTP methods
+  get<T>(endpoint: string): Observable<T> {
+    return this.http.get<T>(`${this.baseUrl}${endpoint}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  post<T>(endpoint: string, data: any): Observable<T> {
+    return this.http.post<T>(`${this.baseUrl}${endpoint}`, data, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  put<T>(endpoint: string, data: any): Observable<T> {
+    return this.http.put<T>(`${this.baseUrl}${endpoint}`, data, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  // Review APIs
+  getProductReviews(productId: number): Observable<Review[]> {
+    return this.http.get<Review[]>(`${this.baseUrl}/reviews/products/${productId}`);
+  }
+
+  addReview(productId: number, review: CreateReviewRequest): Observable<Review> {
+    return this.http.post<Review>(`${this.baseUrl}/reviews/products/${productId}`, review, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  updateReview(reviewId: number, review: UpdateReviewRequest): Observable<Review> {
+    return this.http.put<Review>(`${this.baseUrl}/reviews/${reviewId}`, review, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  deleteReview(reviewId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/reviews/${reviewId}`, {
       headers: this.getAuthHeaders()
     });
   }

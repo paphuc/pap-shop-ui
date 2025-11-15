@@ -120,6 +120,16 @@ export class LoginComponent {
         console.error('Login error:', error);
         if (error.status === 0) {
           this.message = 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.';
+        } else if (error.status === 401) {
+          // Xử lý các lỗi 401 theo API_EXCEPTIONS.md
+          const errorMsg = error.error?.message || error.message;
+          if (errorMsg?.includes('not found')) {
+            this.message = 'Không tìm thấy tên đăng nhập/Email/Số điện thoại';
+          } else if (errorMsg?.includes('locked')) {
+            this.message = 'Tài khoản đã bị khóa';
+          } else {
+            this.message = 'Thông tin đăng nhập không hợp lệ';
+          }
         } else if (error.status === 404) {
           this.message = 'API không tồn tại. Vui lòng kiểm tra server.';
         } else {

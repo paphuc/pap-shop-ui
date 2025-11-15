@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { CartService } from '../../services/cart.service';
 import { Product } from '../../models/product.model';
+import { ReviewsComponent } from '../reviews/reviews.component';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReviewsComponent],
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.css']
 })
@@ -18,6 +19,7 @@ export class ProductDetailComponent implements OnInit {
   error = '';
   selectedQuantity = 1;
   addingToCart = false;
+  buyingNow = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -80,7 +82,9 @@ export class ProductDetailComponent implements OnInit {
   }
 
   increaseQuantity() {
-    this.selectedQuantity++;
+    if (this.product && this.selectedQuantity < this.product.stock) {
+      this.selectedQuantity++;
+    }
   }
 
   decreaseQuantity() {
@@ -98,11 +102,63 @@ export class ProductDetailComponent implements OnInit {
         alert('Đã thêm vào giỏ hàng!');
         this.addingToCart = false;
       },
-      error: () => {
-        alert('Lỗi khi thêm vào giỏ hàng!');
+      error: (error) => {
+        let errorMessage = 'Lỗi khi thêm vào giỏ hàng';
+        
+        if (error.status === 400) {
+          const msg = error.error?.message || error.message;
+          if (msg?.includes('không đủ hàng')) {
+            errorMessage = msg; // Đã là tiếng Việt: "Sản phẩm {name} không đủ hàng"
+          } else if (msg?.includes('Product ID is required')) {
+            errorMessage = 'ID sản phẩm là bắt buộc';
+          } else if (msg?.includes('Quantity is required')) {
+            errorMessage = 'Số lượng là bắt buộc';
+          } else if (msg?.includes('Quantity must be at least 1')) {
+            errorMessage = 'Số lượng phải ít nhất là 1';
+          } else {
+            errorMessage = msg || 'Dữ liệu không hợp lệ';
+          }
+        } else if (error.status === 404) {
+          const msg = error.error?.message || error.message;
+          if (msg?.includes('User not found')) {
+            errorMessage = 'Không tìm thấy người dùng';
+          } else if (msg?.includes('Product not found')) {
+            errorMessage = 'Không tìm thấy sản phẩm';
+          }
+        }
+        
+        alert(errorMessage);
         this.addingToCart = false;
       }
     });
+  }
+
+  buyNow() {
+    if (!this.product || !this.product.id) return;
+    
+    // Kiểm tra đăng nhập
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Vui lòng đăng nhập để mua hàng!');
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    // Chuyển đến trang checkout với thông tin sản phẩm
+    this.router.navigate(['/checkout'], {
+      state: {
+        buyNow: true,
+        product: this.product,
+        quantity: this.selectedQuantity
+      }
+    });
+  }
+
+  getStockClass(stock: number): string {
+    if (stock === 0) return 'stock-out';
+    if (stock <= 5) return 'stock-low';
+    if (stock <= 20) return 'stock-medium';
+    return 'stock-high';
   }
 
   goBack(): void {
