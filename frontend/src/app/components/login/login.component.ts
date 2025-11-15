@@ -14,7 +14,7 @@ import { ApiService } from '../../services/api.service';
         <h2>Đăng nhập</h2>
         <form (ngSubmit)="onLogin()" #loginForm="ngForm">
           <div class="form-group">
-            <label for="emailOrPhone">Email hoặc số điện thoại:</label>
+            <label for="emailOrPhone">Username, Email hoặc số điện thoại:</label>
             <input type="text" id="emailOrPhone" name="emailOrPhone" [(ngModel)]="loginData.emailOrPhone" required>
           </div>
           <div class="form-group">
@@ -133,7 +133,29 @@ export class LoginComponent {
         } else if (error.status === 404) {
           this.message = 'API không tồn tại. Vui lòng kiểm tra server.';
         } else {
-          this.message = 'Đăng nhập thất bại: ' + (error.error?.message || error.message || 'Lỗi server');
+          // Hiển thị message từ backend hoặc fallback message
+          let errorMessage = 'Đăng nhập thất bại';
+          
+          if (error.error) {
+            if (typeof error.error === 'string') {
+              errorMessage = error.error;
+            } else if (error.error.message) {
+              errorMessage = error.error.message;
+            }
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+          
+          // Xử lý các message cụ thể từ backend
+          if (errorMessage.includes('Username/Email/Phone number not found')) {
+            this.message = 'Username/Email/Số điện thoại không tồn tại.';
+          } else if (errorMessage.includes('Invalid credentials')) {
+            this.message = 'Email/số điện thoại hoặc mật khẩu không đúng.';
+          } else if (errorMessage.includes('Account has been locked')) {
+            this.message = 'Tài khoản đã bị khóa. Vui lòng liên hệ admin.';
+          } else {
+            this.message = errorMessage;
+          }
         }
       }
     });
