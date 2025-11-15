@@ -130,7 +130,39 @@ export class RegisterComponent {
       },
       error: (error) => {
         console.error('Register error:', error);
-        alert('Đăng ký thất bại: ' + (error.error || error.message || 'Lỗi không xác định'));
+        let errorMessage = 'Đăng ký thất bại';
+        
+        if (error.status === 400) {
+          const msg = error.error?.message || error.message;
+          if (msg?.includes('Password must be at least 6 characters')) {
+            errorMessage = 'Mật khẩu phải có ít nhất 6 ký tự';
+          } else if (msg?.includes('Invalid email format')) {
+            errorMessage = 'Định dạng email không hợp lệ';
+          } else if (msg?.includes('Invalid phone number')) {
+            errorMessage = 'Số điện thoại không hợp lệ';
+          } else if (msg?.includes('Username is required')) {
+            errorMessage = 'Tên đăng nhập là bắt buộc';
+          } else {
+            errorMessage = msg || 'Dữ liệu không hợp lệ';
+          }
+        } else if (error.status === 409) {
+          const msg = error.error?.message || error.message;
+          if (msg?.includes('Email already in use')) {
+            errorMessage = 'Email đã được sử dụng';
+          } else if (msg?.includes('Phone already in use')) {
+            errorMessage = 'Số điện thoại đã được sử dụng';
+          } else if (msg?.includes('Username already in use')) {
+            errorMessage = 'Tên đăng nhập đã được sử dụng';
+          } else {
+            errorMessage = msg || 'Thông tin đã tồn tại';
+          }
+        } else if (error.status === 500) {
+          errorMessage = 'Không tìm thấy vai trò';
+        } else {
+          errorMessage = error.error?.message || error.message || 'Lỗi không xác định';
+        }
+        
+        alert(errorMessage);
       }
     });
   }

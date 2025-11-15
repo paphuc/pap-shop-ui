@@ -114,6 +114,48 @@
   margin-left: 10px;
 }
 
+.product-stock {
+  margin-bottom: 30px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stock-label {
+  font-weight: 600;
+  color: #333;
+}
+
+.stock-value {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.stock-out {
+  color: #dc3545;
+  background: #f8d7da;
+}
+
+.stock-low {
+  color: #fd7e14;
+  background: #fff3cd;
+}
+
+.stock-medium {
+  color: #ffc107;
+  background: #fff3cd;
+}
+
+.stock-high {
+  color: #28a745;
+  background: #d4edda;
+}
+
 .quantity-selector {
   display: flex;
   align-items: center;

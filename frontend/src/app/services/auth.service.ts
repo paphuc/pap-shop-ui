@@ -34,6 +34,7 @@ export class AuthService {
       const payload = JSON.parse(atob(token.split('.')[1]));
       console.log('Token payload:', payload);
       return {
+        id: payload.userId || payload.id,
         username: payload.sub,
         name: payload.name || payload.fullName || payload.sub,
         email: payload.email,

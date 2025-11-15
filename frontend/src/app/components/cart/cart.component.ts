@@ -21,7 +21,22 @@ import { Cart, CartItem } from '../../models/cart.model';
       <div *ngIf="!loading && !error">
         <div *ngIf="cart && cart.cartItems.length > 0; else emptyCart" class="cart-content">
           <div class="cart-items">
+            <!-- Header với checkbox chọn tất cả -->
+            <div class="cart-header-row">
+              <label class="select-all">
+                <input type="checkbox" 
+                       [checked]="selectAll" 
+                       (change)="toggleSelectAll()">
+                <span>Chọn tất cả ({{cart.cartItems.length}} sản phẩm)</span>
+              </label>
+            </div>
+            
             <div *ngFor="let item of cart.cartItems" class="cart-item">
+              <label class="item-checkbox">
+                <input type="checkbox" 
+                       [checked]="isItemSelected(item.id)"
+                       (change)="toggleSelectItem(item.id)">
+              </label>
               <div class="item-image">
                 <img [src]="getProductImage(item.product)" [alt]="item.product.name">
               </div>
@@ -42,13 +57,20 @@ import { Cart, CartItem } from '../../models/cart.model';
           </div>
           
           <div class="cart-summary">
+            <div class="summary-info">
+              <p>Đã chọn: {{getSelectedCount()}} sản phẩm</p>
+            </div>
             <div class="summary-row">
-              <span>Tổng cộng:</span>
-              <span class="total-price">{{ formatPrice(getTotalPrice()) }}</span>
+              <span>Tổng thanh toán:</span>
+              <span class="total-price">{{ formatPrice(getSelectedTotal()) }}</span>
             </div>
             <div class="cart-actions">
               <button class="clear-btn" (click)="clearCart()">Xóa tất cả</button>
-              <button class="checkout-btn">Thanh toán</button>
+              <button class="checkout-btn" 
+                      [disabled]="getSelectedCount() === 0"
+                      (click)="goToCheckout()">
+                Mua hàng ({{getSelectedCount()}})
+              </button>
             </div>
           </div>
         </div>
@@ -88,15 +110,37 @@ import { Cart, CartItem } from '../../models/cart.model';
       grid-template-columns: 2fr 1fr;
       gap: 30px;
     }
+    .cart-header-row {
+      padding: 15px 20px;
+      border-bottom: 1px solid #eee;
+      background: #f8f9fa;
+    }
+    .select-all {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 500;
+    }
     .cart-item {
       display: grid;
-      grid-template-columns: 80px 1fr 120px 100px 40px;
+      grid-template-columns: 40px 80px 1fr 120px 100px 40px;
       gap: 15px;
       align-items: center;
       padding: 20px;
       border: 1px solid #ddd;
       border-radius: 8px;
       margin-bottom: 15px;
+    }
+    .item-checkbox {
+      display: flex;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .item-checkbox input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
     }
     .item-image img {
       width: 80px;
@@ -143,6 +187,18 @@ import { Cart, CartItem } from '../../models/cart.model';
       font-size: 16px;
       cursor: pointer;
     }
+    .checkout-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .summary-info {
+      margin-bottom: 10px;
+      color: #666;
+      font-size: 14px;
+    }
+    .summary-info p {
+      margin: 0;
+    }
     .clear-btn {
       background: #dc3545;
       color: white;
@@ -187,6 +243,8 @@ export class CartComponent implements OnInit {
   cart: Cart | null = null;
   loading = true;
   error = '';
+  selectedItems: Set<number> = new Set();
+  selectAll = false;
 
   constructor(
     private apiService: ApiService,
@@ -206,7 +264,11 @@ export class CartComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading cart:', error);
-        this.error = 'Không thể tải giỏ hàng';
+        if (error.status === 404) {
+          this.error = 'Không tìm thấy người dùng';
+        } else {
+          this.error = 'Không thể tải giỏ hàng';
+        }
         this.loading = false;
       }
     });
@@ -221,6 +283,27 @@ export class CartComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error updating quantity:', error);
+        let errorMessage = 'Lỗi cập nhật số lượng';
+        
+        if (error.status === 400) {
+          const msg = error.error?.message || error.message;
+          if (msg?.includes('không đủ hàng')) {
+            errorMessage = msg; // Đã là tiếng Việt
+          } else if (msg?.includes('Cart item does not belong to user')) {
+            errorMessage = 'Sản phẩm không thuộc về người dùng này';
+          } else if (msg?.includes('Quantity must be at least 1')) {
+            errorMessage = 'Số lượng phải ít nhất là 1';
+          }
+        } else if (error.status === 404) {
+          const msg = error.error?.message || error.message;
+          if (msg?.includes('Cart item not found')) {
+            errorMessage = 'Không tìm thấy sản phẩm trong giỏ hàng';
+          } else if (msg?.includes('User not found')) {
+            errorMessage = 'Không tìm thấy người dùng';
+          }
+        }
+        
+        alert(errorMessage);
       }
     });
   }
@@ -232,6 +315,23 @@ export class CartComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error removing item:', error);
+        let errorMessage = 'Lỗi xóa sản phẩm';
+        
+        if (error.status === 400) {
+          const msg = error.error?.message || error.message;
+          if (msg?.includes('Cart item does not belong to user')) {
+            errorMessage = 'Sản phẩm không thuộc về người dùng này';
+          }
+        } else if (error.status === 404) {
+          const msg = error.error?.message || error.message;
+          if (msg?.includes('Cart item not found')) {
+            errorMessage = 'Không tìm thấy sản phẩm trong giỏ hàng';
+          } else if (msg?.includes('User not found')) {
+            errorMessage = 'Không tìm thấy người dùng';
+          }
+        }
+        
+        alert(errorMessage);
       }
     });
   }
@@ -244,6 +344,13 @@ export class CartComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error clearing cart:', error);
+          let errorMessage = 'Lỗi xóa giỏ hàng';
+          
+          if (error.status === 404) {
+            errorMessage = 'Không tìm thấy người dùng';
+          }
+          
+          alert(errorMessage);
         }
       });
     }
@@ -272,5 +379,62 @@ export class CartComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/']);
+  }
+
+  toggleSelectAll() {
+    this.selectAll = !this.selectAll;
+    if (this.selectAll) {
+      this.cart?.cartItems.forEach(item => this.selectedItems.add(item.id));
+    } else {
+      this.selectedItems.clear();
+    }
+  }
+
+  toggleSelectItem(itemId: number) {
+    if (this.selectedItems.has(itemId)) {
+      this.selectedItems.delete(itemId);
+    } else {
+      this.selectedItems.add(itemId);
+    }
+    this.updateSelectAllState();
+  }
+
+  updateSelectAllState() {
+    if (!this.cart) return;
+    this.selectAll = this.cart.cartItems.length > 0 && 
+                    this.cart.cartItems.every(item => this.selectedItems.has(item.id));
+  }
+
+  isItemSelected(itemId: number): boolean {
+    return this.selectedItems.has(itemId);
+  }
+
+  getSelectedTotal(): number {
+    if (!this.cart) return 0;
+    return this.cart.cartItems
+      .filter(item => this.selectedItems.has(item.id))
+      .reduce((total, item) => total + (item.product.price * item.quantity), 0);
+  }
+
+  getSelectedCount(): number {
+    return this.selectedItems.size;
+  }
+
+  goToCheckout() {
+    if (this.selectedItems.size === 0) {
+      alert('Vui lòng chọn sản phẩm để đặt hàng!');
+      return;
+    }
+    
+    // Truyền thông tin các sản phẩm đã chọn
+    const selectedCartItems = this.cart?.cartItems.filter(item => 
+      this.selectedItems.has(item.id)
+    ) || [];
+    
+    this.router.navigate(['/checkout'], {
+      state: {
+        selectedItems: selectedCartItems
+      }
+    });
   }
 }

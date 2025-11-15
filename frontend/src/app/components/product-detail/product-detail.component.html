@@ -18,22 +18,27 @@
         <h3>Mô tả sản phẩm</h3>
         <p>{{ product.description || 'Chưa có mô tả' }}</p>
       </div>
-      <div class="product-quantity" *ngIf="product.quantity !== undefined">
-        <span class="quantity-label">Số lượng còn lại:</span>
-        <span class="quantity-value">{{ product.quantity }}</span>
+      <div class="product-stock" *ngIf="product.stock !== undefined">
+        <span class="stock-label">Kho:</span>
+        <span class="stock-value" [ngClass]="getStockClass(product.stock)">{{ product.stock }} sản phẩm</span>
       </div>
       <div class="product-actions">
         <div class="quantity-selector">
           <label>Số lượng:</label>
-          <button (click)="decreaseQuantity()">-</button>
+          <button (click)="decreaseQuantity()" [disabled]="selectedQuantity <= 1">-</button>
           <span>{{ selectedQuantity }}</span>
-          <button (click)="increaseQuantity()">+</button>
+          <button (click)="increaseQuantity()" [disabled]="selectedQuantity >= product.stock">+</button>
         </div>
         <button class="add-to-cart-btn" (click)="addToCart()" [disabled]="addingToCart">
           {{ addingToCart ? 'Đang thêm...' : 'Thêm vào giỏ hàng' }}
         </button>
-        <button class="buy-now-btn">Mua ngay</button>
+        <button class="buy-now-btn" (click)="buyNow()" [disabled]="buyingNow">
+          {{ buyingNow ? 'Đang xử lý...' : 'Mua ngay' }}
+        </button>
       </div>
     </div>
   </div>
+  
+  <!-- Reviews Section -->
+  <app-reviews *ngIf="product" [productId]="product.id"></app-reviews>
 </div>

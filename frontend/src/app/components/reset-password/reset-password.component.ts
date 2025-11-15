@@ -312,7 +312,24 @@ export class ResetPasswordComponent implements OnInit {
         }, 2000);
       },
       error: (error) => {
-        this.message = error.error || 'Mã xác thực không đúng hoặc đã hết hạn';
+        if (error.status === 500) {
+          const msg = error.error?.message || error.message;
+          if (msg?.includes('Invalid or expired reset code')) {
+            this.message = 'Mã đặt lại không hợp lệ hoặc đã hết hạn';
+          } else if (msg?.includes('Reset code has expired')) {
+            this.message = 'Mã đặt lại đã hết hạn';
+          } else if (msg?.includes('Passwords do not match')) {
+            this.message = 'Mật khẩu không khớp';
+          } else if (msg?.includes('Password must be at least 6 characters')) {
+            this.message = 'Mật khẩu phải có ít nhất 6 ký tự';
+          } else if (msg?.includes('User not found')) {
+            this.message = 'Không tìm thấy người dùng';
+          } else {
+            this.message = msg || 'Lỗi server';
+          }
+        } else {
+          this.message = error.error?.message || 'Mã xác thực không đúng hoặc đã hết hạn';
+        }
         this.messageClass = 'error';
         this.isLoading = false;
       }
