@@ -31,7 +31,7 @@ import { AnnouncementToastComponent } from './components/announcement/announceme
             class="search-input"
           />
           <button (click)="onSearch()" class="search-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <circle cx="11" cy="11" r="8"></circle>
               <path d="m21 21-4.35-4.35"></path>
             </svg>
@@ -111,10 +111,10 @@ import { AnnouncementToastComponent } from './components/announcement/announceme
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 15px 30px;
-      background: #2c3e50;
-      color: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px 30px;
+      background: #ffffff;
+      color: #000000;
+      border-bottom: 1px solid #e5e5e5;
     }
     .nav-center {
       flex: 1;
@@ -125,72 +125,79 @@ import { AnnouncementToastComponent } from './components/announcement/announceme
     .search-container {
       display: flex;
       align-items: center;
-      background: white;
-      border-radius: 25px;
-      padding: 5px;
+      background: #f3f4f6;
+      border-radius: 999px;
+      padding: 8px 16px;
       width: 100%;
       max-width: 400px;
       position: relative;
+      border: none;
     }
     .suggestions-dropdown {
       position: absolute;
       top: 100%;
       left: 0;
       right: 0;
-      background: white;
-      border: 1px solid #ddd;
+      background: #ffffff;
+      border: 1px solid #e5e5e5;
       border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       z-index: 1000;
       max-height: 300px;
       overflow-y: auto;
+      margin-top: 4px;
     }
     .suggestion-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 15px;
+      padding: 12px 16px;
       cursor: pointer;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid #f3f4f6;
+      transition: background-color 0.2s;
     }
     .suggestion-item:hover {
-      background: #f8f9fa;
+      background: #f9fafb;
     }
     .suggestion-item:last-child {
       border-bottom: none;
     }
     .suggestion-name {
-      color: #333;
+      color: #000000;
       font-size: 14px;
+      font-weight: 400;
     }
     .suggestion-price {
-      color: #e74c3c;
-      font-weight: bold;
+      color: #6b7280;
+      font-weight: 500;
       font-size: 12px;
     }
     .search-input {
       flex: 1;
       border: none;
       outline: none;
-      padding: 8px 15px;
-      border-radius: 20px;
+      padding: 8px 0;
+      background: transparent;
       font-size: 14px;
+      color: #000000;
+    }
+    .search-input::placeholder {
+      color: #6b7280;
     }
     .search-btn {
-      background: #3498db;
+      background: none;
       border: none;
-      border-radius: 50%;
-      width: 35px;
-      height: 35px;
+      width: 20px;
+      height: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      color: white;
-      transition: background 0.3s;
+      color: #2563EB;
+      transition: color 0.2s;
     }
     .search-btn:hover {
-      background: #2980b9;
+      color: #1d4ed8;
     }
     .search-overlay {
       position: fixed;
@@ -261,9 +268,10 @@ import { AnnouncementToastComponent } from './components/announcement/announceme
     }
     .logo {
       font-size: 24px;
-      font-weight: bold;
-      color: white;
+      font-weight: 600;
+      color: #000000;
       text-decoration: none;
+      letter-spacing: -0.02em;
     }
     .nav-right {
       display: flex;
@@ -271,19 +279,24 @@ import { AnnouncementToastComponent } from './components/announcement/announceme
     }
     .nav-btn {
       padding: 8px 16px;
-      color: white;
+      color: #000000;
       text-decoration: none;
       border-radius: 4px;
-      transition: background 0.3s;
+      transition: all 0.2s;
+      font-size: 14px;
+      font-weight: 500;
     }
     .nav-btn:hover {
-      background: rgba(255,255,255,0.1);
+      background: #f3f4f6;
     }
     .register-btn {
-      background: #3498db;
+      background: #000000;
+      color: #ffffff;
+      border: 1px solid #000000;
     }
     .register-btn:hover {
-      background: #2980b9;
+      background: #ffffff;
+      color: #000000;
     }
     .user-info {
       color: white;
@@ -298,36 +311,37 @@ import { AnnouncementToastComponent } from './components/announcement/announceme
     }
     .container {
       min-height: calc(100vh - 70px);
-      background: #ecf0f1;
+      background: #ffffff;
     }
     .user-dropdown {
       position: relative;
       cursor: pointer;
     }
     .user-avatar {
-      width: 40px;
-      height: 40px;
-      background: #3498db;
+      width: 36px;
+      height: 36px;
+      background: #000000;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
-      font-weight: bold;
-      font-size: 16px;
-      transition: background 0.3s;
+      color: #ffffff;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s;
     }
     .user-avatar:hover {
-      background: #2980b9;
+      background: #374151;
     }
     .dropdown-menu {
       position: absolute;
       top: 100%;
       right: 0;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      min-width: 150px;
+      background: #ffffff;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      min-width: 160px;
       z-index: 1000;
       margin-top: 8px;
       overflow: hidden;
@@ -336,48 +350,50 @@ import { AnnouncementToastComponent } from './components/announcement/announceme
       display: flex;
       align-items: center;
       padding: 12px 16px;
-      color: #333;
+      color: #000000;
       text-decoration: none;
       border: none;
       background: none;
       width: 100%;
       text-align: left;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: background-color 0.2s;
+      font-size: 14px;
+      font-weight: 400;
     }
     .dropdown-item:hover {
-      background: #f8f9fa;
+      background: #f9fafb;
     }
     .dropdown-item i {
       margin-right: 8px;
       width: 16px;
     }
     .cart-icon {
-      color: white;
+      color: #000000;
       padding: 8px;
       border-radius: 4px;
-      transition: background 0.3s;
+      transition: all 0.2s;
       margin-right: 15px;
       position: relative;
       text-decoration: none;
     }
     .cart-icon:hover {
-      background: rgba(255,255,255,0.1);
+      background: #f3f4f6;
     }
     .cart-badge {
       position: absolute;
       top: -5px;
       right: -5px;
-      background: #e74c3c;
-      color: white;
+      background: #2563EB;
+      color: #ffffff;
       border-radius: 50%;
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
-      font-weight: bold;
+      font-size: 11px;
+      font-weight: 500;
     }
   `]
 })

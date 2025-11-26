@@ -209,21 +209,21 @@
 }
 
 .add-to-cart-btn {
-  background: #007bff;
+  background: #2563EB;
   color: white;
 }
 
 .add-to-cart-btn:hover {
-  background: #0056b3;
+  background: #1d4ed8;
 }
 
 .buy-now-btn {
-  background: #28a745;
+  background: #000000;
   color: white;
 }
 
 .buy-now-btn:hover {
-  background: #1e7e34;
+  background: #374151;
 }
 
 @media (max-width: 768px) {
