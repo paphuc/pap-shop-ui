@@ -9,235 +9,166 @@ import { Cart, CartItem } from '../../models/cart.model';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="cart-container">
-      <div class="cart-header">
-        <h1>Giỏ hàng của bạn</h1>
-        <button class="back-btn" (click)="goBack()">← Tiếp tục mua sắm</button>
-      </div>
-
-      <div *ngIf="loading" class="loading">Đang tải...</div>
-      <div *ngIf="error" class="error">{{ error }}</div>
-
-      <div *ngIf="!loading && !error">
-        <div *ngIf="cart && cart.cartItems.length > 0; else emptyCart" class="cart-content">
-          <div class="cart-items">
-            <!-- Header với checkbox chọn tất cả -->
-            <div class="cart-header-row">
-              <label class="select-all">
-                <input type="checkbox" 
-                       [checked]="selectAll" 
-                       (change)="toggleSelectAll()">
-                <span>Chọn tất cả ({{cart.cartItems.length}} sản phẩm)</span>
-              </label>
-            </div>
-            
-            <div *ngFor="let item of cart.cartItems" class="cart-item">
-              <label class="item-checkbox">
-                <input type="checkbox" 
-                       [checked]="isItemSelected(item.id)"
-                       (change)="toggleSelectItem(item.id)">
-              </label>
-              <div class="item-image">
-                <img [src]="getProductImage(item.product)" [alt]="item.product.name">
-              </div>
-              <div class="item-info">
-                <h3>{{ item.product.name }}</h3>
-                <p class="item-price">{{ formatPrice(item.product.price) }}</p>
-              </div>
-              <div class="item-quantity">
-                <button (click)="updateQuantity(item, item.quantity - 1)" [disabled]="item.quantity <= 1">-</button>
-                <span>{{ item.quantity }}</span>
-                <button (click)="updateQuantity(item, item.quantity + 1)">+</button>
-              </div>
-              <div class="item-total">
-                {{ formatPrice(item.product.price * item.quantity) }}
-              </div>
-              <button class="remove-btn" (click)="removeItem(item)">×</button>
-            </div>
-          </div>
-          
-          <div class="cart-summary">
-            <div class="summary-info">
-              <p>Đã chọn: {{getSelectedCount()}} sản phẩm</p>
-            </div>
-            <div class="summary-row">
-              <span>Tổng thanh toán:</span>
-              <span class="total-price">{{ formatPrice(getSelectedTotal()) }}</span>
-            </div>
-            <div class="cart-actions">
-              <button class="clear-btn" (click)="clearCart()">Xóa tất cả</button>
-              <button class="checkout-btn" 
-                      [disabled]="getSelectedCount() === 0"
-                      (click)="goToCheckout()">
-                Mua hàng ({{getSelectedCount()}})
-              </button>
-            </div>
-          </div>
+    <div class="min-h-screen bg-white py-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-12 pb-6 border-b border-gray-200">
+          <h1 class="text-4xl font-light text-black tracking-tight">Giỏ hàng</h1>
+          <button 
+            class="luxury-btn bg-white text-black px-6 py-3 text-sm font-medium"
+            (click)="goBack()">
+            ← Tiếp tục mua sắm
+          </button>
         </div>
 
-        <ng-template #emptyCart>
-          <div class="empty-cart">
-            <h2>Giỏ hàng trống</h2>
-            <p>Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm</p>
-            <button class="shop-btn" (click)="goBack()">Mua sắm ngay</button>
+        <!-- Loading State -->
+        <div *ngIf="loading" class="flex items-center justify-center py-16">
+          <div class="animate-spin w-6 h-6 border-2 border-gray-300 border-t-black rounded-full"></div>
+          <span class="ml-3 text-gray-600 text-sm">Đang tải...</span>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error" class="luxury-card p-6 mb-8">
+          <p class="text-sm text-gray-900">{{ error }}</p>
+        </div>
+
+        <!-- Cart Content -->
+        <div *ngIf="!loading && !error">
+          <div *ngIf="cart && cart.cartItems.length > 0; else emptyCart" class="lg:grid lg:grid-cols-12 lg:gap-8">
+            <!-- Cart Items -->
+            <div class="lg:col-span-8">
+              <div class="bg-white">
+                <!-- Select All Header -->
+                <div class="px-6 py-4 border-b border-gray-200">
+                  <label class="flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      [checked]="selectAll" 
+                      (change)="toggleSelectAll()"
+                      class="w-4 h-4 text-black border border-gray-300 rounded-sm">
+                    <span class="ml-3 text-sm font-medium text-gray-900">
+                      Chọn tất cả ({{cart.cartItems.length}} sản phẩm)
+                    </span>
+                  </label>
+                </div>
+                
+                <!-- Cart Items List -->
+                <div class="divide-y divide-gray-200">
+                  <div *ngFor="let item of cart.cartItems" class="p-6 hover:bg-gray-50 transition-colors duration-200">
+                    <div class="flex items-center space-x-4">
+                      <!-- Checkbox -->
+                      <label class="cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          [checked]="isItemSelected(item.id)"
+                          (change)="toggleSelectItem(item.id)"
+                          class="w-4 h-4 text-black border border-gray-300 rounded-sm">
+                      </label>
+                      
+                      <!-- Product Image -->
+                      <div class="flex-shrink-0 w-20 h-20 bg-gray-50 overflow-hidden">
+                        <img 
+                          [src]="getProductImage(item.product)" 
+                          [alt]="item.product.name"
+                          class="w-full h-full object-cover">
+                      </div>
+                      
+                      <!-- Product Info -->
+                      <div class="flex-1 min-w-0">
+                        <h3 class="text-base font-medium text-black truncate">{{ item.product.name }}</h3>
+                        <p class="text-sm text-gray-600 mt-1">{{ formatPrice(item.product.price) }}</p>
+                      </div>
+                      
+                      <!-- Quantity Controls -->
+                      <div class="flex items-center space-x-2">
+                        <button 
+                          (click)="updateQuantity(item, item.quantity - 1)" 
+                          [disabled]="item.quantity <= 1"
+                          class="luxury-btn w-8 h-8 bg-white text-black text-sm disabled:opacity-50">
+                          -
+                        </button>
+                        <span class="w-8 text-center text-sm text-black">{{ item.quantity }}</span>
+                        <button 
+                          (click)="updateQuantity(item, item.quantity + 1)"
+                          class="luxury-btn w-8 h-8 bg-white text-black text-sm">
+                          +
+                        </button>
+                      </div>
+                      
+                      <!-- Item Total -->
+                      <div class="text-right">
+                        <p class="text-base font-medium text-black">{{ formatPrice(item.product.price * item.quantity) }}</p>
+                      </div>
+                      
+                      <!-- Remove Button -->
+                      <button 
+                        (click)="removeItem(item)"
+                        class="w-8 h-8 text-gray-400 hover:text-black transition-colors duration-200">
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Order Summary -->
+            <div class="lg:col-span-4 mt-8 lg:mt-0">
+              <div class="luxury-card luxury-shadow bg-white p-6 sticky top-8">
+                <h2 class="text-lg font-medium text-black mb-6 border-b border-gray-200 pb-3">Tóm tắt đơn hàng</h2>
+                
+                <div class="space-y-3 mb-6">
+                  <div class="flex justify-between text-sm text-gray-600">
+                    <span>Đã chọn:</span>
+                    <span>{{getSelectedCount()}} sản phẩm</span>
+                  </div>
+                  <div class="border-t border-gray-200 pt-3">
+                    <div class="flex justify-between items-center">
+                      <span class="text-base font-medium text-black">Tổng cộng:</span>
+                      <span class="text-xl font-semibold text-black">{{ formatPrice(getSelectedTotal()) }}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="space-y-3">
+                  <button 
+                    class="luxury-btn-accent w-full py-3 px-6 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    [disabled]="getSelectedCount() === 0"
+                    (click)="goToCheckout()">
+                    Thanh toán ({{getSelectedCount()}})
+                  </button>
+                  <button 
+                    class="luxury-btn w-full bg-white text-black py-2 px-6 text-sm font-medium"
+                    (click)="clearCart()">
+                    Xóa tất cả
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-        </ng-template>
+
+          <!-- Empty Cart -->
+          <ng-template #emptyCart>
+            <div class="text-center py-20">
+              <div class="mx-auto w-16 h-16 bg-gray-100 flex items-center justify-center mb-6">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h8m-8 0a2 2 0 100 4 2 2 0 000-4zm8 0a2 2 0 100 4 2 2 0 000-4z"></path>
+                </svg>
+              </div>
+              <h2 class="text-2xl font-light text-black mb-2">Giỏ hàng trống</h2>
+              <p class="text-gray-600 mb-8 max-w-md mx-auto">Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm</p>
+              <button 
+                class="luxury-btn-accent px-8 py-3 text-sm font-medium"
+                (click)="goBack()">
+                Mua sắm ngay
+              </button>
+            </div>
+          </ng-template>
+        </div>
       </div>
     </div>
   `,
-  styles: [`
-    .cart-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .cart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-    .back-btn {
-      background: #6c757d;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .cart-content {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 30px;
-    }
-    .cart-header-row {
-      padding: 15px 20px;
-      border-bottom: 1px solid #eee;
-      background: #f8f9fa;
-    }
-    .select-all {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      font-weight: 500;
-    }
-    .cart-item {
-      display: grid;
-      grid-template-columns: 40px 80px 1fr 120px 100px 40px;
-      gap: 15px;
-      align-items: center;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
-    .item-checkbox {
-      display: flex;
-      justify-content: center;
-      cursor: pointer;
-    }
-    .item-checkbox input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-    }
-    .item-image img {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 5px;
-    }
-    .item-quantity {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .item-quantity button {
-      width: 30px;
-      height: 30px;
-      border: 1px solid #ddd;
-      background: white;
-      cursor: pointer;
-    }
-    .cart-summary {
-      background: #f8f9fa;
-      padding: 20px;
-      border-radius: 8px;
-      height: fit-content;
-    }
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      font-size: 18px;
-      font-weight: bold;
-    }
-    .cart-actions {
-      display: flex;
-      gap: 10px;
-      flex-direction: column;
-    }
-    .checkout-btn {
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 15px;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .checkout-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-    .summary-info {
-      margin-bottom: 10px;
-      color: #666;
-      font-size: 14px;
-    }
-    .summary-info p {
-      margin: 0;
-    }
-    .clear-btn {
-      background: #dc3545;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .remove-btn {
-      background: #dc3545;
-      color: white;
-      border: none;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-    .empty-cart {
-      text-align: center;
-      padding: 60px 20px;
-    }
-    .shop-btn {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 20px;
-    }
-    .loading, .error {
-      text-align: center;
-      padding: 40px;
-    }
-    .error {
-      color: #dc3545;
-    }
-  `]
+  styles: []
 })
 export class CartComponent implements OnInit {
   cart: Cart | null = null;

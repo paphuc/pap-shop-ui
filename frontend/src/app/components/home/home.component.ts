@@ -11,89 +11,79 @@ import { Product } from '../../models/product.model';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <div class="home-container">
-      <h1>Pap Shop bao ship 0Đ - Đăng ký ngay!</h1>
-      <div class="products-grid">
-        <div *ngFor="let product of products" class="product-card" (click)="viewProduct(product.id!)">
-          <div class="product-image">
-            <img [src]="getImageUrl(product)" [alt]="product.name" (error)="onImageError($event)" />
+    <div class="min-h-screen bg-white">
+      <!-- Hero Section -->
+      <div class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div class="text-center">
+            <h1 class="text-6xl font-light text-black tracking-tight mb-6">
+              Pap Shop
+            </h1>
+            <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+              Miễn phí vận chuyển - Đăng ký ngay
+            </p>
+            <button class="luxury-btn-accent px-8 py-3 text-sm font-medium">
+              Khám phá bộ sưu tập
+            </button>
           </div>
-          <div class="product-info">
-            <h3 class="product-name">{{ product.name }}</h3>
-            <p class="product-price">{{ formatPrice(product.price) }}</p>
-            <button class="add-to-cart-btn" (click)="addToCart(product, $event)">Thêm vào giỏ</button>
+        </div>
+      </div>
+
+      <!-- Products Section -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl font-light text-black mb-4">Sản phẩm nổi bật</h2>
+          <div class="w-16 h-px bg-black mx-auto"></div>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div 
+            *ngFor="let product of products" 
+            class="group bg-white hover:luxury-shadow transition-all duration-300 cursor-pointer"
+            (click)="viewProduct(product.id!)">
+            
+            <!-- Product Image -->
+            <div class="aspect-square bg-gray-50 overflow-hidden relative mb-4 group-hover:ring-2 group-hover:ring-accent transition-all duration-300">
+              <img 
+                [src]="getImageUrl(product)" 
+                [alt]="product.name" 
+                (error)="onImageError($event)"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              
+              <!-- Quick Add Button Overlay -->
+              <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                <button 
+                  class="luxury-btn-accent px-4 py-2 text-sm font-medium opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300"
+                  (click)="addToCart(product, $event)">
+                  Thêm vào giỏ
+                </button>
+              </div>
+            </div>
+            
+            <!-- Product Info -->
+            <div class="">
+              <h3 class="text-base font-medium text-black mb-2 line-clamp-2">
+                {{ product.name }}
+              </h3>
+              <p class="text-sm text-gray-900">{{ formatPrice(product.price) }}</p>
+            </div>
           </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div *ngIf="products.length === 0" class="text-center py-20">
+          <div class="mx-auto w-16 h-16 bg-gray-100 flex items-center justify-center mb-6">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-light text-black mb-2">Chưa có sản phẩm</h3>
+          <p class="text-gray-600">Các sản phẩm sẽ được cập nhật sớm</p>
         </div>
       </div>
     </div>
   `,
-  styles: [`
-    .home-container {
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-      margin-top: 30px;
-    }
-    .product-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      overflow: hidden;
-      transition: transform 0.3s, box-shadow 0.3s;
-      cursor: pointer;
-    }
-    .product-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-    }
-    .product-image {
-      width: 100%;
-      height: 200px;
-      overflow: hidden;
-      background: #f8f9fa;
-    }
-    .product-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .product-info {
-      padding: 15px;
-    }
-    .product-name {
-      margin: 0 0 10px 0;
-      font-size: 16px;
-      font-weight: 600;
-      color: #333;
-      line-height: 1.4;
-    }
-    .product-price {
-      margin: 0 0 10px 0;
-      font-size: 18px;
-      font-weight: bold;
-      color: #e74c3c;
-    }
-    .add-to-cart-btn {
-      width: 100%;
-      padding: 8px 16px;
-      background: #3498db;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      transition: background 0.3s;
-    }
-    .add-to-cart-btn:hover {
-      background: #2980b9;
-    }
-  `]
+  styles: []
 })
 export class HomeComponent implements OnInit {
   products: Product[] = [];

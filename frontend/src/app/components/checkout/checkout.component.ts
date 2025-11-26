@@ -465,7 +465,7 @@ import { CreateOrderRequest } from '../../models/order.model';
     .place-order-btn {
       width: 100%;
       padding: 16px;
-      background: #ee4d2d;
+      background: #2563EB;
       color: white;
       border: none;
       border-radius: 4px;
@@ -477,7 +477,7 @@ import { CreateOrderRequest } from '../../models/order.model';
     }
     
     .place-order-btn:hover:not(:disabled) {
-      background: #d73211;
+      background: #1d4ed8;
     }
     
     .place-order-btn:disabled {
