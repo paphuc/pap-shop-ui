@@ -503,15 +503,9 @@ export class AppComponent implements OnInit {
 
   onSearch() {
     if (this.searchQuery.trim()) {
-      this.apiService.searchProducts(this.searchQuery.trim()).subscribe({
-        next: (products) => {
-          this.searchResults = products;
-          this.showSearchResults = true;
-        },
-        error: () => {
-          this.searchResults = [];
-          this.showSearchResults = true;
-        }
+      this.showSuggestions = false;
+      this.router.navigate(['/search'], { 
+        queryParams: { q: this.searchQuery.trim() } 
       });
     }
   }
@@ -559,6 +553,7 @@ export class AppComponent implements OnInit {
 
   navigateToProduct(productId: number) {
     this.showSuggestions = false;
+    this.searchQuery = '';
     this.router.navigate(['/product', productId]);
   }
 

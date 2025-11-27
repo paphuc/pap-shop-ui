@@ -1,0 +1,30 @@
+.category-nav {
+  @apply flex items-center gap-8 py-4 overflow-x-auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.category-item {
+  @apply text-gray-700 font-medium text-sm whitespace-nowrap px-2 py-2 border-none bg-transparent cursor-pointer transition-all duration-200 ease-in-out;
+  min-width: fit-content;
+  
+  &:hover {
+    @apply text-blue-600;
+    text-decoration: underline;
+  }
+  
+  &.active {
+    @apply text-black font-semibold;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+  
+  &:focus {
+    outline: none;
+  }
+}
