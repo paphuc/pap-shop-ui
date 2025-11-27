@@ -1,6 +1,5 @@
-<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-  <rect width="200" height="200" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
-  <circle cx="80" cy="70" r="8" fill="#adb5bd"/>
-  <path d="M50 120 L70 100 L90 120 L130 80 L150 100 L150 150 L50 150 Z" fill="#adb5bd"/>
-  <text x="100" y="180" text-anchor="middle" font-family="Arial" font-size="12" fill="#6c757d">No Image</text>
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="400" fill="#f3f4f6"/>
+  <path d="M200 120c-44.18 0-80 35.82-80 80s35.82 80 80 80 80-35.82 80-80-35.82-80-80-80zm0 120c-22.09 0-40-17.91-40-40s17.91-40 40-40 40 17.91 40 40-17.91 40-40 40z" fill="#9ca3af"/>
+  <path d="M280 160h-20v-20c0-11.05-8.95-20-20-20s-20 8.95-20 20v20h-40v-20c0-11.05-8.95-20-20-20s-20 8.95-20 20v20h-20c-11.05 0-20 8.95-20 20v120c0 11.05 8.95 20 20 20h160c11.05 0 20-8.95 20-20V180c0-11.05-8.95-20-20-20z" fill="#d1d5db"/>
 </svg>

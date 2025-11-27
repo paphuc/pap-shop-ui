@@ -25,6 +25,10 @@ export class ApiService {
     return this.http.get<Product[]>(`${this.baseUrl}/products/search?name=${encodeURIComponent(name)}`);
   }
 
+  getProductsByCategory(categoryId: number): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.baseUrl}/products/category/${categoryId}`);
+  }
+
   addProduct(product: Product): Observable<Product> {
     return this.http.post<Product>(`${this.baseUrl}/products`, product, {
       headers: this.getAuthHeaders()

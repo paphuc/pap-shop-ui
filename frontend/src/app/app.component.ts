@@ -37,13 +37,27 @@ import { AnnouncementToastComponent } from './components/announcement/announceme
             </svg>
           </button>
         </div>
-        <!-- Suggestions Dropdown -->
-        <div class="suggestions-dropdown" *ngIf="showSuggestions && suggestions.length > 0">
-          <div class="suggestion-item" *ngFor="let product of suggestions" (mousedown)="selectSuggestion(product)">
-            <span class="suggestion-name">{{product.name}}</span>
-            <span class="suggestion-price">{{product.price | currency:'VND':'symbol':'1.0-0'}}</span>
+          <!-- Live Search Dropdown -->
+          <div class="search-results-dropdown" *ngIf="showSuggestions && suggestions.length > 0">
+            <div 
+              class="search-result-item" 
+              *ngFor="let product of suggestions" 
+              (mousedown)="selectSuggestion(product)"
+              (click)="navigateToProduct(product.id!)">
+              
+              <div class="product-thumbnail">
+                <img 
+                  [src]="getProductImage(product)" 
+                  [alt]="product.name"
+                  (error)="onImageError($event)" />
+              </div>
+              
+              <div class="product-info">
+                <div class="product-name">{{ product.name }}</div>
+                <div class="product-price">{{ formatPrice(product.price) }}</div>
+              </div>
+            </div>
           </div>
-        </div>
       </div>
       <div class="nav-right" *ngIf="!isLoggedIn">
         <a routerLink="/login" class="nav-btn">Đăng nhập</a>
@@ -121,6 +135,7 @@ import { AnnouncementToastComponent } from './components/announcement/announceme
       display: flex;
       justify-content: center;
       margin: 0 20px;
+      position: relative;
     }
     .search-container {
       display: flex;
@@ -133,44 +148,79 @@ import { AnnouncementToastComponent } from './components/announcement/announceme
       position: relative;
       border: none;
     }
-    .suggestions-dropdown {
+    .search-results-dropdown {
       position: absolute;
       top: 100%;
       left: 0;
       right: 0;
       background: #ffffff;
-      border: 1px solid #e5e5e5;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
       z-index: 1000;
-      max-height: 300px;
+      max-height: 400px;
       overflow-y: auto;
-      margin-top: 4px;
+      margin-top: 8px;
+      border: 1px solid #e5e7eb;
     }
-    .suggestion-item {
+    .search-results-dropdown::-webkit-scrollbar {
+      width: 6px;
+    }
+    .search-results-dropdown::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 3px;
+    }
+    .search-results-dropdown::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    .search-results-dropdown::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .search-result-item {
       display: flex;
-      justify-content: space-between;
       align-items: center;
       padding: 12px 16px;
       cursor: pointer;
       border-bottom: 1px solid #f3f4f6;
-      transition: background-color 0.2s;
+      transition: all 0.2s ease;
+      gap: 12px;
     }
-    .suggestion-item:hover {
-      background: #f9fafb;
+    .search-result-item:hover {
+      background: #f8fafc;
     }
-    .suggestion-item:last-child {
+    .search-result-item:last-child {
       border-bottom: none;
     }
-    .suggestion-name {
-      color: #000000;
-      font-size: 14px;
-      font-weight: 400;
+    .product-thumbnail {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #f1f5f9;
     }
-    .suggestion-price {
-      color: #6b7280;
+    .product-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .product-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .product-name {
+      color: #1f2937;
+      font-size: 14px;
       font-weight: 500;
-      font-size: 12px;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .product-price {
+      color: #dc2626;
+      font-weight: 600;
+      font-size: 13px;
     }
     .search-input {
       flex: 1;
@@ -505,6 +555,32 @@ export class AppComponent implements OnInit {
     this.searchQuery = product.name;
     this.showSuggestions = false;
     this.onSearch();
+  }
+
+  navigateToProduct(productId: number) {
+    this.showSuggestions = false;
+    this.router.navigate(['/product', productId]);
+  }
+
+  getProductImage(product: Product): string {
+    if (product.images && product.images.length > 0 && product.images[0].imageUrl) {
+      return product.images[0].imageUrl;
+    }
+    if (product.image) {
+      return product.image.startsWith('http') ? product.image : `/assets/${product.image}`;
+    }
+    return '/assets/no-image.svg';
+  }
+
+  onImageError(event: any) {
+    event.target.src = '/assets/no-image.svg';
+  }
+
+  formatPrice(price: number): string {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(price);
   }
 
   toggleUserMenu() {
