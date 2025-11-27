@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { CartService } from '../../services/cart.service';
-import { Product } from '../../models/product.model';
+import { Product, Category } from '../../models/product.model';
 
 @Component({
   selector: 'app-home',
@@ -24,6 +24,27 @@ import { Product } from '../../models/product.model';
             </p>
             <button class="luxury-btn-accent px-8 py-3 text-sm font-medium">
               Khám phá bộ sưu tập
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Navigation -->
+      <div class="border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="category-nav">
+            <button 
+              class="category-item" 
+              [class.active]="selectedCategoryId === null"
+              (click)="selectCategory(null)">
+              Tất cả
+            </button>
+            <button 
+              *ngFor="let category of categories" 
+              class="category-item" 
+              [class.active]="selectedCategoryId === category.id"
+              (click)="selectCategory(category.id!)">
+              {{ category.name }}
             </button>
           </div>
         </div>
@@ -83,10 +104,12 @@ import { Product } from '../../models/product.model';
       </div>
     </div>
   `,
-  styles: []
+  styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
   products: Product[] = [];
+  categories: Category[] = [];
+  selectedCategoryId: number | null = null;
 
   constructor(
     private apiService: ApiService, 
@@ -95,13 +118,24 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.loadCategories();
     this.loadProducts();
+  }
+
+  loadCategories() {
+    this.apiService.getCategories().subscribe({
+      next: (data) => {
+        this.categories = data;
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+      }
+    });
   }
 
   loadProducts() {
     this.apiService.getProducts().subscribe({
       next: (data) => {
-        console.log('Products loaded:', data);
         this.products = data;
       },
       error: (error) => {
@@ -109,6 +143,24 @@ export class HomeComponent implements OnInit {
         this.products = [];
       }
     });
+  }
+
+  selectCategory(categoryId: number | null) {
+    this.selectedCategoryId = categoryId;
+    
+    if (categoryId === null) {
+      this.loadProducts();
+    } else {
+      this.apiService.getProductsByCategory(categoryId).subscribe({
+        next: (data) => {
+          this.products = data;
+        },
+        error: (error) => {
+          console.error('Error loading products by category:', error);
+          this.products = [];
+        }
+      });
+    }
   }
 
   getImageUrl(product: Product): string {
