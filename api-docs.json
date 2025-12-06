@@ -18,16 +18,20 @@
   ],
   "tags": [
     {
+      "name": "Chat",
+      "description": "RAG Chatbot API"
+    },
+    {
+      "name": "Announcement",
+      "description": "System announcement management API"
+    },
+    {
       "name": "Order",
       "description": "Order management API"
     },
     {
       "name": "Review",
       "description": "Product review management API"
-    },
-    {
-      "name": "Notification",
-      "description": "Notification management API"
     }
   ],
   "paths": {
@@ -344,7 +348,7 @@
         "tags": [
           "Order"
         ],
-        "summary": "Update order status",
+        "summary": "Update order status (Admin)",
         "operationId": "updateOrderStatus",
         "parameters": [
           {
@@ -391,16 +395,16 @@
         ]
       }
     },
-    "/api/notifications/{notificationId}/read": {
+    "/api/orders/{orderId}/cancel": {
       "put": {
         "tags": [
-          "Notification"
+          "Order"
         ],
-        "summary": "Mark notification as read",
-        "operationId": "markAsRead",
+        "summary": "Cancel order",
+        "operationId": "cancelOrder",
         "parameters": [
           {
-            "name": "notificationId",
+            "name": "orderId",
             "in": "path",
             "required": true,
             "schema": {
@@ -415,33 +419,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer Authentication": []
-          }
-        ]
-      }
-    },
-    "/api/notifications/read-all": {
-      "put": {
-        "tags": [
-          "Notification"
-        ],
-        "summary": "Mark all notifications as read",
-        "operationId": "markAllAsRead",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/Order"
                 }
               }
             }
@@ -614,6 +592,125 @@
             }
           }
         }
+      }
+    },
+    "/api/announcements/{id}": {
+      "put": {
+        "tags": [
+          "Announcement"
+        ],
+        "summary": "Update announcement (Admin)",
+        "operationId": "updateAnnouncement",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnouncementRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnouncementResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Announcement"
+        ],
+        "summary": "Delete announcement (Admin)",
+        "operationId": "deleteAnnouncement",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          }
+        ]
+      }
+    },
+    "/api/announcements/{id}/toggle": {
+      "put": {
+        "tags": [
+          "Announcement"
+        ],
+        "summary": "Toggle announcement status (Admin)",
+        "operationId": "toggleActive",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnouncementResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          }
+        ]
       }
     },
     "/api/user/validate-reset-code": {
@@ -1191,18 +1288,19 @@
         ]
       }
     },
-    "/api/notifications/admin/create": {
+    "/api/chat": {
       "post": {
         "tags": [
-          "Notification"
+          "Chat"
         ],
-        "summary": "Create notification (Admin)",
-        "operationId": "createNotification",
+        "summary": "Chat với AI về sản phẩm",
+        "description": "Tìm kiếm sản phẩm bằng semantic search và trả lời câu hỏi của khách hàng",
+        "operationId": "chat",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NotificationRequest"
+                "$ref": "#/components/schemas/ChatRequest"
               }
             }
           },
@@ -1214,17 +1312,12 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ChatResponse"
                 }
               }
             }
           }
-        },
-        "security": [
-          {
-            "Bearer Authentication": []
-          }
-        ]
+        }
       }
     },
     "/api/category": {
@@ -1306,6 +1399,69 @@
             }
           }
         }
+      }
+    },
+    "/api/announcements": {
+      "get": {
+        "tags": [
+          "Announcement"
+        ],
+        "summary": "Get all announcements (Admin)",
+        "operationId": "getAllAnnouncements",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AnnouncementResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Announcement"
+        ],
+        "summary": "Create announcement (Admin)",
+        "operationId": "createAnnouncement",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnouncementRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnouncementResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer Authentication": []
+          }
+        ]
       }
     },
     "/api/user": {
@@ -1588,91 +1744,6 @@
         ]
       }
     },
-    "/api/notifications": {
-      "get": {
-        "tags": [
-          "Notification"
-        ],
-        "summary": "Get user notifications",
-        "operationId": "getUserNotifications",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationResponse"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer Authentication": []
-          }
-        ]
-      }
-    },
-    "/api/notifications/unread": {
-      "get": {
-        "tags": [
-          "Notification"
-        ],
-        "summary": "Get unread notifications",
-        "operationId": "getUnreadNotifications",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NotificationResponse"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer Authentication": []
-          }
-        ]
-      }
-    },
-    "/api/notifications/unread/count": {
-      "get": {
-        "tags": [
-          "Notification"
-        ],
-        "summary": "Get unread notification count",
-        "operationId": "getUnreadCount",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer Authentication": []
-          }
-        ]
-      }
-    },
     "/api/dashboard/stats": {
       "get": {
         "tags": [
@@ -1753,6 +1824,30 @@
                 "schema": {
                   "type": "integer",
                   "format": "int32"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/announcements/active": {
+      "get": {
+        "tags": [
+          "Announcement"
+        ],
+        "summary": "Get active announcements",
+        "operationId": "getActiveAnnouncements",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AnnouncementResponse"
+                  }
                 }
               }
             }
@@ -1851,43 +1946,6 @@
             }
           }
         }
-      }
-    },
-    "/api/notifications/{notificationId}": {
-      "delete": {
-        "tags": [
-          "Notification"
-        ],
-        "summary": "Delete notification",
-        "operationId": "deleteNotification",
-        "parameters": [
-          {
-            "name": "notificationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer Authentication": []
-          }
-        ]
       }
     },
     "/api/cart/clear": {
@@ -2141,6 +2199,19 @@
             "items": {
               "$ref": "#/components/schemas/ProductImage"
             }
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Review"
+            }
+          },
+          "embedding": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "float"
+            }
           }
         }
       },
@@ -2156,6 +2227,29 @@
           },
           "product": {
             "$ref": "#/components/schemas/Product"
+          }
+        }
+      },
+      "Review": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -2288,6 +2382,54 @@
           }
         }
       },
+      "AnnouncementRequest": {
+        "required": [
+          "message",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "AnnouncementResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "ValidateCodeRequest": {
         "type": "object",
         "properties": {
@@ -2362,26 +2504,29 @@
           }
         }
       },
-      "NotificationRequest": {
-        "required": [
-          "message",
-          "title"
-        ],
+      "ChatRequest": {
         "type": "object",
         "properties": {
-          "title": {
-            "type": "string"
-          },
           "message": {
             "type": "string"
           },
-          "productId": {
+          "topK": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "ChatResponse": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": "string"
           },
-          "userId": {
-            "type": "integer",
-            "format": "int32"
+          "relatedProducts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Product"
+            }
           }
         }
       },
@@ -2400,35 +2545,6 @@
             "minimum": 1,
             "type": "integer",
             "format": "int32"
-          }
-        }
-      },
-      "NotificationResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "title": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "productId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "productName": {
-            "type": "string"
-          },
-          "isRead": {
-            "type": "boolean"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
           }
         }
       }
