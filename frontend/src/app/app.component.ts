@@ -8,11 +8,12 @@ import { CartService } from './services/cart.service';
 import { AuthTimeoutService } from './services/auth-timeout.service';
 import { Product } from './models/product.model';
 import { AnnouncementToastComponent } from './components/announcement/announcement-toast.component';
+import { AiChatComponent } from './components/ai-chat/ai-chat.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, CommonModule, FormsModule, AnnouncementToastComponent],
+  imports: [RouterOutlet, RouterLink, CommonModule, FormsModule, AnnouncementToastComponent, AiChatComponent],
   template: `
     <nav class="navbar">
       <div class="nav-left">
@@ -115,6 +116,7 @@ import { AnnouncementToastComponent } from './components/announcement/announceme
     </div>
 
     <app-announcement-toast></app-announcement-toast>
+    <app-ai-chat></app-ai-chat>
     
     <div class="container">
       <router-outlet></router-outlet>
